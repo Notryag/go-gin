@@ -3,10 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/tryag/common"
+	"gorm.io/driver/mysql"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // 中间件
@@ -18,12 +22,66 @@ func myHandler() gin.HandlerFunc {
 	}
 }
 
+type User struct {
+	gorm.Model
+	Name     string `gorm:"type:varchar(20);not null"`
+	Email    string `gorm:"type:varchar(20);not null;unique"`
+	Password string `gorm:"size:255"`
+}
+
+func InitDB() *gorm.DB {
+	host := "localhost"
+	port := "3306"
+	userName := "root"
+	password := "root"
+	database := "test"
+	charset := "utf8"
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local", userName, password, host, port, database, charset)
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database, err:" + err.Error())
+	}
+
+	// 自动迁移
+	err = db.AutoMigrate(&User{})
+	if err != nil {
+		panic("failed to migrate database, err:" + err.Error())
+	}
+
+	return db
+}
+
 func main() {
-	fmt.Println(common.Add(1, 3))
+	InitDB()
 	r := gin.Default()
-	r.GET("/hello", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"name": "hello world",
+
+	r.POST("/api/auth/register", func(ctx *gin.Context) {
+		name := ctx.PostForm("name")
+		telephone := ctx.PostForm("telephone")
+		password := ctx.PostForm("password")
+
+		if len(telephone) != 11 {
+			ctx.JSON(http.StatusUnprocessableEntity, map[string]interface{}{
+				"code": 422,
+				"msg":  "手机号必须为11位",
+			})
+			return
+		}
+
+		if len(password) < 6 {
+			ctx.JSON(http.StatusUnprocessableEntity, map[string]interface{}{
+				"code": 422,
+				"msg":  "密码不能少于6位",
+			})
+			return
+		}
+		if len(name) == 0 {
+			name = RandomString(10)
+		}
+		log.Println(name, telephone, password)
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"msg": "success",
 		})
 	})
 
@@ -87,4 +145,14 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+}
+
+func RandomString(n int) string {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	var letters = []byte("asdfghjklzxcvbnmqwertyuiopASDFGHJKLZXCVBNMQWERTYUIOP")
+	result := make([]byte, n)
+	for i := range result {
+		result[i] = letters[r.Intn(len(letters))]
+	}
+	return string(result)
 }

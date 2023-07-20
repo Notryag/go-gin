@@ -25,3 +25,17 @@ go work use ./common
 # 安装gin -u表示拉去网络最新版本的包
 go get -u github.com/gin-gonic/gin
 ```
+
+## 数据库
+https://gorm.io/ gorm官网
+
+需要安装gorm 和 mysql的驱动
+```shell
+go get -u gorm.io/gorm
+go get -u gorm.io/driver/mysql
+```
+
+
+
+## 记录需要学习知识点
+RandomString 方法, 查看其中的`make(byte[], n)`, `rand.Intn()`
