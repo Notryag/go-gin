@@ -29,6 +29,11 @@ go get -u github.com/gin-gonic/gin
 ## 数据库
 https://gorm.io/ gorm官网
 
+启动mysql的docker容器
+```shell
+docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7
+```
+
 需要安装gorm 和 mysql的驱动
 ```shell
 go get -u gorm.io/gorm
