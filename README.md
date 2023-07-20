@@ -18,11 +18,8 @@ go work use ./common
 
 
 ```shell
-go work init
-mkdir common && cd common
 # mod初始化
 go mod init
-go work use ./common
 # 添加mod
 # 安装gin -u表示拉去网络最新版本的包
 go get -u github.com/gin-gonic/gin

@@ -37,6 +37,15 @@ func main() {
 			"msg": "success",
 		})
 	})
+
+	v2 := api.Group("/v2")
+
+	v2.GET("/users", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"msg": "v2 success",
+		})
+	})
+
 	if err := r.Run(":8080"); err != nil {
 		log.Fatal(err)
 	}
