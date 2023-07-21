@@ -43,3 +43,7 @@ go get -u gorm.io/driver/mysql
 
 ## 记录需要学习知识点
 RandomString 方法, 查看其中的`make(byte[], n)`, `rand.Intn()`
+安装jwt v4
+```shell
+go get -u github.com/dgrijalva/jwt-go/v4
+```
